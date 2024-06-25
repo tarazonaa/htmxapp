@@ -1,0 +1,20 @@
+{% for contact in contacts %}
+<tr class="bg-white border-b hover:bg-gray-100 h-12">
+  <td class="px-4 py-2">{{ contact.first }}</td>
+  <td class="px-4 py-2">{{ contact.last }}</td>
+  <td class="px-4 py-2">{{ contact.phone }}</td>
+  <td class="px-4 py-2">{{ contact.email }}</td>
+  <td class="px-4 py-2">
+    <a
+      class="p-2 bg-blue-500 hover:bg-blue-700 rounded text-white"
+      href="/contacts/{{contact.id}}/edit"
+      >Edit</a
+    >
+    <a
+      class="p-2 bg-green-500 hover:bg-green-700 rounded text-white"
+      href="/contacts/{{contact.id}}"
+      >View</a
+    >
+  </td>
+</tr>
+{% endfor %}

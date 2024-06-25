@@ -1,5 +1,4 @@
 use actix_files::NamedFile;
-use actix_web::http::header::HeaderValue;
 use actix_web::{delete, get, post, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use serde_derive::Serialize;
 use std::collections::HashMap;
@@ -54,13 +53,6 @@ async fn contacts(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
         })
         .collect::<Vec<_>>();
 
-    if req
-        .headers()
-        .get("HX-Trigger")
-        .unwrap_or(&HeaderValue::from_static("none"))
-        == &HeaderValue::from_static("search")
-    {}
-
     let total_pages = (contacts_to_show.len() + per_page - 1) / per_page; // Calculate total pages needed
     let start_index = (page - 1) * per_page; // Calculate start index
     let end_index = std::cmp::min(start_index + per_page, contacts_to_show.len()); // Calculate end index
@@ -74,8 +66,23 @@ async fn contacts(req: HttpRequest, data: web::Data<AppState>) -> HttpResponse {
     context.insert("page", &page);
     context.insert("total_pages", &total_pages);
 
-    let body = data.tera.render("index.html", &context).unwrap();
+    let mut body = data
+        .tera
+        .render("index.html", &context)
+        .unwrap_or_else(|e| e.to_string());
+
+    if req.headers().get("HX-Trigger-Name").is_some() {
+        body = data.tera.render("rows.html", &context).unwrap();
+    }
+
     HttpResponse::Ok().body(body)
+}
+
+#[get("/contacts/count")]
+async fn contacts_count(data: web::Data<AppState>) -> impl Responder {
+    let contacts_db = data.contacts_vec.lock().unwrap();
+    let count = contacts_db.len();
+    HttpResponse::Ok().body(format!("{}", count))
 }
 
 #[get("/contacts/{id}")]
@@ -270,6 +277,7 @@ pub async fn main() -> std::io::Result<()> {
             .service(update_contact)
             .service(delete_contact)
             .service(contacts_email_get)
+            .service(contacts_count)
             .service(actix_files::Files::new("/static", "./static"))
     })
     .bind("127.0.0.1:8080")?
