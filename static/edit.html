@@ -1,0 +1,41 @@
+
+{% extends "layout.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<form action="/contacts/{{contact.id}}/edit" method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+  <fieldset>
+    <legend class="text-lg font-bold mb-4">Contact Values</legend>
+
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
+      <input hx-trigger="change, keyup delay:200ms changed" hx-get="/contacts/{{contact.id}}/email" hx-target="next .error" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="email" name="email" placeholder="Email" value="{{contact.email}}">
+      <span class="error text-red-500 text-sm italics">{{contact.errors.email | default(value="")}}</span>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="first name">First Name</label>
+      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="first" placeholder="First Name" value="{{contact.first}}">
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="last name">Last Name</label>
+      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="last" placeholder="Last Name" value="{{contact.last}}">
+    </div>
+
+    <div class="mb-6">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="phone">Phone</label>
+      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="tel" name="phone" placeholder="Phone" value="{{contact.phone}}">
+    </div>
+
+    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Save</button>
+  </fieldset>
+</form>
+
+  <p class="mt-4">
+    <a class="text-blue-500 hover:text-blue-800" href="/contacts">Back</a>
+  </p>
+
+<button hx-delete="/contacts/{{contact.id}}" hx-push-url="true" hx-confirm="Are you sure you want to delete this contact?" hx-target="body" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4" type="submit">Delete</button>
+{% endblock %}

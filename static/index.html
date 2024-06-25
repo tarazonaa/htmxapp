@@ -1,15 +1,24 @@
-{% extends "layout.html" %}
-
-{% block title %}
-{{ title }}
-{% endblock title %}
-
-
+{% extends "layout.html" %} {% block title %} {{ title }} {% endblock title %}
 {% block content %}
 <form action="/contacts" method="get" class="mb-4">
-  <label for="search" class="block text-gray-700 text-sm font-bold mb-2">Search Term</label>
-  <input type="search" name="q" value="{{ q }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-  <input type="submit" value="Submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-3">
+  <label for="search" class="block text-gray-700 text-sm font-bold mb-2"
+    >Search Term</label
+  >
+  <input
+    type="search"
+    name="q"
+    value="{{ q }}"
+    hx-get="/contacts"
+    hx-trigger="search, keyup delay:200ms changed"
+    hx-target="tbody"
+    hx-select="tbody tr"
+    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+  />
+  <input
+    type="submit"
+    value="Submit"
+    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-3"
+  />
 </form>
 <table class="min-w-full mb-10 table-auto">
   <thead>
@@ -23,20 +32,44 @@
   </thead>
   <tbody>
     {% for contact in contacts %}
-      <tr class="bg-white border-b">
-        <td class="px-4 py-2">{{ contact.first }}</td>
-        <td class="px-4 py-2">{{ contact.last }}</td>
-        <td class="px-4 py-2">{{ contact.phone }}</td>
-        <td class="px-4 py-2">{{ contact.email }}</td>
-        <td class="px-4 py-2">
-          <a class="p-2 bg-blue-500 hover:bg-blue-700 rounded text-white" href="/contacts/{{contact.id}}/edit">Edit</a>
-          <a class="p-2 bg-green-500 hover:bg-green-700 rounded text-white" href="/contacts/{{contact.id}}">View</a>
-        </td>
-      </tr>
-    {% endfor %}
+    <tr class="bg-white border-b hover:bg-gray-100 h-12">
+      <td class="px-4 py-2">{{ contact.first }}</td>
+      <td class="px-4 py-2">{{ contact.last }}</td>
+      <td class="px-4 py-2">{{ contact.phone }}</td>
+      <td class="px-4 py-2">{{ contact.email }}</td>
+      <td class="px-4 py-2">
+        <a
+          class="p-2 bg-blue-500 hover:bg-blue-700 rounded text-white"
+          href="/contacts/{{contact.id}}/edit"
+          >Edit</a
+        >
+        <a
+          class="p-2 bg-green-500 hover:bg-green-700 rounded text-white"
+          href="/contacts/{{contact.id}}"
+          >View</a
+        >
+      </td>
+    </tr>
+    {% endfor %} {% if contacts|length >= 10 %}
+    <tr>
+      <td colspan="5">
+        <button
+          hx-get="/contacts?page={{ page + 1 }}"
+          hx-swap="outerHTML"
+          hx-select="tbody > tr"
+          hx-target="closest tr"
+          class="text-blue-500 hover:text-blue-700 cursor-pointer"
+        >
+          Next Page
+        </button>
+      </td>
+    </tr>
+    {% endif %}
   </tbody>
 </table>
-<p>
-<a class="mx-auto bg-purple-500 font-bold text-white hover:bg-purple-700 rounded px-8 py-6" href="/contacts/new">Add Contact</a>
-</p>
+<a
+  class="mx-auto bg-purple-500 font-bold text-white hover:bg-purple-700 rounded p-4"
+  href="/contacts/new"
+  >Add Contact</a
+>
 {% endblock content %}
